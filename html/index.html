@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Hamilton Tourist Guide</title>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Hamilton Tourist Guide</title>
+      <style>
+      #map {
+        height: 700px;
+        width: 1400px;
+      }
+    </style>
 
     <!-- Bootstrap CSS v5.2.1 -->
     <link
@@ -17,6 +23,14 @@
   </head>
 
   <body>
+     <script
+      async
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDyKgngxb3e6XfjYl36DopmXYjNW0fyn_E&loading=async&callback=initMap&libraries=marker
+    "></script>
+
+    <script src="../js/map.js"></script>
+    <script src="../js/location.js"></script>
+    
     <header>
       <!-- place navbar here -->
     </header>
@@ -49,15 +63,43 @@
             <button class="btn btn-success" id="geolocation-btn">
                 Show My Location
             </button>
-        
+        </div>
+        <div class="mt-3 form-container" style="width:50%;">
+            <h3>Add a new location</h3>
+            <form id="add-marker-form">
+                <input type="text" class="form-control mb-2" id="address" placeholder="Address" required>
+                <input type="text" class="form-control mb-2" id="name" placeholder="Location Name" required>
+                <textarea class="form-control mb-2" id="description" placeholder="Description" required></textarea>
+                <select class="form-control mb-2" id="category" required>
+                    <option value="">Select a category</option>
+                    <option value="park">Park</option>
+                    <option value="museum">Museum</option>
+                    <option value="restaurant">Restaurant</option>
+                    <option value="waterfall">Waterfall</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Add Marker</button>
+            </form>
+        </div>
+        <div class="mt-3">
+            <h3>Get Directions</h3>
+            <select class="form-control mb-2" id="origin">
+                <option value="">Select an origin</option>
+            </select>
+            <select class="form-control mb-2" id="destination">
+                <option value="">Select a destination</option>
+            </select>
+            <button class="btn btn-info" id="get-directions">Get Directions</button>
         </div>
       </div>
     </main>
     <footer>
       <!-- place footer here -->
     </footer>
+   
+
     <!-- Bootstrap JavaScript Libraries -->
     <script
+
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
       crossorigin="anonymous"></script>
