@@ -6,7 +6,7 @@ function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 43.2387, lng: -79.8881 },
     zoom: 12,
-    mapId: "MAP_ID_GOES_HERE", // Remove or replace with a valid Map ID
+    mapId: "MAP_ID", // Remove or replace with a valid Map ID
   });
 
   for (const location of locations) {
@@ -71,11 +71,30 @@ function initMap() {
       marker.map = map;
     });
   });
+
+  document.getElementById("geolocate").addEventListener("click", function () {
+    navigator.geolocation.getCurrentPosition(showPositionOnMap);
+  });
 }
 
 // Filter markers by type
 function filterMarkers(type) {
   markers.forEach((marker) => {
     marker.map = marker.type === type ? map : null;
+  });
+}
+
+function showPositionOnMap(position) {
+  const icon_content = document.createElement("img");
+  icon_content.src = "http://maps.google.com/mapfiles/kml/shapes/poi.png";
+
+  userMarker = new google.maps.marker.AdvancedMarkerElement({
+    map: map,
+    position: {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+    },
+    title: "You are here",
+    content: icon_content,
   });
 }
