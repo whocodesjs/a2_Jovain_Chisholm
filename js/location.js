@@ -1,5 +1,26 @@
-const locations = [
-  { name: "Bayfront Park", lat: 43.2716, lng: -79.8724, type: "park" },
+/**
+ * @fileoverview This file contains the definition of the `locations` array and the `addLocation` function.
+ * The `locations` array holds predefined locations with their respective details such as name, latitude, longitude, type, and address.
+ * The `addLocation` function allows adding new locations to the `locations` array.
+ */
+
+/**
+ * Array of predefined locations.
+ * Each location object contains the following properties:
+ * - name: The name of the location.
+ * - lat: The latitude of the location.
+ * - lng: The longitude of the location.
+ * - type: The type of the location (e.g., park, museum, waterfall, restaurant).
+ * - address: The address of the location.
+ */
+let locations = [
+  {
+    name: "Bayfront Park",
+    lat: 43.2716,
+    lng: -79.8724,
+    type: "park",
+    address: "200 Harbour Front Dr, Hamilton, ON L8L 1C8",
+  },
   {
     name: "Royal Botanical Gardens",
     lat: 43.336202,
@@ -64,3 +85,16 @@ const locations = [
     address: "1000 Main St E, Hamilton, ON L8M 1N2",
   },
 ];
+
+/**
+ * Adds a new location to the `locations` array.
+ * @param {Object} newLocation - The new location object to be added.
+ * @param {string} newLocation.name - The name of the new location.
+ * @param {number} newLocation.lat - The latitude of the new location.
+ * @param {number} newLocation.lng - The longitude of the new location.
+ * @param {string} newLocation.type - The type of the new location (e.g., park, museum, waterfall, restaurant).
+ * @param {string} newLocation.address - The address of the new location.
+ */
+function addLocation(newLocation) {
+  locations.push(newLocation);
+}

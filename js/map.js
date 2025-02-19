@@ -1,61 +1,32 @@
+/**
+ * @fileoverview This file initializes the Google Map, adds markers for predefined locations, handles user interactions, and provides functionalities such as filtering markers, geolocation, and getting directions.
+ */
+
 let map;
 let markers = [];
 let userMarker;
-let userLocation = null;
+let userLocation = null; // Store the user's location
 
+/**
+ * Initializes the Google Map and sets up event listeners for various user interactions.
+ */
 function initMap() {
+  // Initialize the map centered at a specific location
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 43.2387, lng: -79.8881 },
     zoom: 12,
-    mapId: "MAP_ID",
+    mapId: "f1b7b3b3b1b7b3b3", // Replace with a valid Map ID or remove if not needed
   });
 
+  // Loop through the locations array and create markers
   for (const location of locations) {
-    let new_icon;
-    if (location.type === "park")
-      new_icon = "https://maps.google.com/mapfiles/ms/icons/green-dot.png";
-    else if (location.type === "museum")
-      new_icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
-    else if (location.type === "waterfall")
-      new_icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
-    else if (location.type === "restaurant")
-      new_icon = "https://maps.google.com/mapfiles/ms/icons/purple-dot.png";
-    else new_icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
-
-    const icon_content = document.createElement("img");
-    icon_content.src = new_icon;
-
-    const contentString = `<h3>${location.name}</h3>${
-      location.address ? `<p>${location.address}</p>` : ""
-    }`;
-
-    const infoWindow = new google.maps.InfoWindow({
-      content: contentString,
-    });
-
-    const marker = new google.maps.marker.AdvancedMarkerElement({
-      map: map,
-      position: { lat: location.lat, lng: location.lng },
-      title: location.name,
-      content: icon_content,
-    });
-
-    marker.type = location.type;
-
-    marker.addListener("click", () => {
-      infoWindow.close();
-      infoWindow.open({
-        anchor: marker,
-        map,
-        shouldFocus: false,
-      });
-    });
-
-    markers.push(marker);
+    addMarker(location);
   }
 
+  // Populate the origin and destination dropdowns
   listDropdownOptions();
 
+  // Add event listeners for filter buttons
   document
     .getElementById("show-parks")
     .addEventListener("click", () => filterMarkers("park"));
@@ -69,12 +40,14 @@ function initMap() {
     .getElementById("show-restaurants")
     .addEventListener("click", () => filterMarkers("restaurant"));
 
+  // Add event listener for "Show All" button
   document.getElementById("show-all").addEventListener("click", () => {
     markers.forEach((marker) => {
       marker.map = map;
     });
   });
 
+  // Add event listener for "Show My Location" button
   document.getElementById("geolocate").addEventListener("click", () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -84,14 +57,17 @@ function initMap() {
             lng: position.coords.longitude,
           };
 
+          // Store the user's location
           userLocation = {
             name: "You are here",
             lat: pos.lat,
             lng: pos.lng,
           };
 
+          // Add the user's location to the dropdowns
           listDropdownOptions();
 
+          // Show the user's location on the map
           showPositionOnMap(position);
         },
         () => {
@@ -103,24 +79,125 @@ function initMap() {
     }
   });
 
+  // Add event listener for "Get Directions" button
   document
     .getElementById("get-directions")
     .addEventListener("click", getDirections);
 
+  // Add event listeners to dropdowns to prevent same location selection
   document.getElementById("origin").addEventListener("change", updateDropdown);
   document
     .getElementById("destination")
     .addEventListener("change", updateDropdown);
+
+  // Add event listener for the form submission
+  document.getElementById("add-marker-form").addEventListener("submit", (e) => {
+    e.preventDefault(); // Prevent the form from submitting
+
+    // Get form inputs
+    const address = document.getElementById("address").value;
+    const name = document.getElementById("name").value;
+    const description = document.getElementById("description").value;
+    const category = document.getElementById("category").value;
+
+    // Geocode the address to get latitude and longitude
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: address }, (results, status) => {
+      if (status === "OK") {
+        const position = results[0].geometry.location;
+
+        // Create a new location object
+        const newLocation = {
+          name: name,
+          lat: position.lat(),
+          lng: position.lng(),
+          type: category,
+          address: address,
+          description: description,
+        };
+
+        // Add the new location to the locations array
+        addLocation(newLocation);
+
+        // Add the new marker to the map
+        addMarker(newLocation);
+
+        // Update the dropdowns
+        listDropdownOptions();
+
+        // Reset the form
+        document.getElementById("add-marker-form").reset();
+      } else {
+        alert("Geocode was not successful for the following reason: " + status);
+      }
+    });
+  });
 }
 
+/**
+ * Adds a marker to the map for a given location.
+ * @param {Object} location - The location object containing details of the location.
+ */
+function addMarker(location) {
+  let new_icon;
+  if (location.type === "park")
+    new_icon = "https://maps.google.com/mapfiles/ms/icons/green-dot.png";
+  else if (location.type === "museum")
+    new_icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+  else if (location.type === "waterfall")
+    new_icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+  else if (location.type === "restaurant")
+    new_icon = "https://maps.google.com/mapfiles/ms/icons/purple-dot.png";
+  else new_icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
+
+  const icon_content = document.createElement("img");
+  icon_content.src = new_icon;
+
+  let contentString = `<h3>${location.name}</h3>`;
+  if (location.address) {
+    contentString += `<p>${location.address}</p>`;
+  }
+  if (location.description) {
+    contentString += `<p>${location.description}</p>`;
+  }
+  const infoWindow = new google.maps.InfoWindow({
+    content: contentString,
+  });
+
+  const marker = new google.maps.marker.AdvancedMarkerElement({
+    map: map,
+    position: { lat: location.lat, lng: location.lng },
+    title: location.name,
+    content: icon_content,
+  });
+
+  marker.type = location.type;
+
+  marker.addListener("click", () => {
+    infoWindow.close();
+    infoWindow.open({
+      anchor: marker,
+      map,
+      shouldFocus: false,
+    });
+  });
+
+  markers.push(marker);
+}
+
+/**
+ * Populates the origin and destination dropdowns with locations.
+ */
 function listDropdownOptions() {
   const originDropdown = document.getElementById("origin");
   const destinationDropdown = document.getElementById("destination");
 
+  // Clear existing options
   originDropdown.innerHTML = '<option value="">Select Origin</option>';
   destinationDropdown.innerHTML =
     '<option value="">Select Destination</option>';
 
+  // Add options for each location
   locations.forEach((location) => {
     const option = document.createElement("option");
     option.value = location.name;
@@ -130,6 +207,7 @@ function listDropdownOptions() {
     destinationDropdown.appendChild(option);
   });
 
+  // Add the user's location to the dropdowns if available
   if (userLocation) {
     const userOption = document.createElement("option");
     userOption.value = "You are here";
@@ -139,9 +217,13 @@ function listDropdownOptions() {
     destinationDropdown.appendChild(userOption);
   }
 
+  // Update dropdowns to disable selected options
   updateDropdown();
 }
 
+/**
+ * Updates the dropdowns to prevent the same location from being selected as both origin and destination.
+ */
 function updateDropdown() {
   const originDropdown = document.getElementById("origin");
   const destinationDropdown = document.getElementById("destination");
@@ -149,6 +231,7 @@ function updateDropdown() {
   const originValue = originDropdown.value;
   const destinationValue = destinationDropdown.value;
 
+  // Enable all options in both dropdowns
   Array.from(originDropdown.options).forEach(
     (option) => (option.disabled = false)
   );
@@ -156,51 +239,56 @@ function updateDropdown() {
     (option) => (option.disabled = false)
   );
 
+  // Disable the selected option in the other dropdown
   if (originValue) {
-    const selectedOrigin = destinationDropdown.querySelector(
+    const selectedOriginOption = destinationDropdown.querySelector(
       `option[value="${originValue}"]`
     );
-    if (selectedOrigin) {
-      selectedOrigin.disabled = true;
+    if (selectedOriginOption) {
+      selectedOriginOption.disabled = true;
     }
   }
 
   if (destinationValue) {
-    const selectedDestination = originDropdown.querySelector(
+    const selectedDestinationOption = originDropdown.querySelector(
       `option[value="${destinationValue}"]`
     );
-    if (selectedDestination) {
-      selectedDestination.disabled = true;
+    if (selectedDestinationOption) {
+      selectedDestinationOption.disabled = true;
     }
   }
 }
 
+/**
+ * Gets directions between the selected origin and destination.
+ */
 function getDirections() {
   const origin = document.getElementById("origin").value;
   const destination = document.getElementById("destination").value;
 
   if (!origin || !destination) {
-    alert("Please select both origin and destination");
+    alert("Please select both origin and destination.");
     return;
   }
 
+  // Find the selected locations in the locations array or use the user's location
   const originLocation =
-    origin === "You are here"
+    origin === "Your location"
       ? userLocation
       : locations.find((loc) => loc.name === origin);
   const destinationLocation =
-    destination === "You are here"
+    destination === "Your location"
       ? userLocation
       : locations.find((loc) => loc.name === destination);
 
   if (!originLocation || !destinationLocation) {
-    alert("Invalid origin or destination selected");
+    alert("Invalid origin or destination selected.");
     return;
   }
 
+  // Use Google Maps DirectionsService to get directions
   const directionsService = new google.maps.DirectionsService();
   const directionsRenderer = new google.maps.DirectionsRenderer();
-
   directionsRenderer.setMap(map);
 
   directionsService.route(
@@ -222,21 +310,30 @@ function getDirections() {
   );
 }
 
-// Filter markers by type
+/**
+ * Filters markers by type.
+ * @param {string} type - The type of markers to display (e.g., park, museum, waterfall, restaurant).
+ */
 function filterMarkers(type) {
   markers.forEach((marker) => {
     marker.map = marker.type === type ? map : null;
   });
 }
 
+/**
+ * Shows the user's position on the map.
+ * @param {Object} position - The position object containing the user's coordinates.
+ */
 function showPositionOnMap(position) {
   const icon_content = document.createElement("img");
   icon_content.src = "http://maps.google.com/mapfiles/kml/shapes/poi.png";
 
+  // Remove existing user marker if it exists
   if (userMarker) {
     userMarker.map = null;
   }
 
+  // Add a new marker for the user's location
   userMarker = new google.maps.marker.AdvancedMarkerElement({
     map: map,
     position: {
@@ -247,6 +344,7 @@ function showPositionOnMap(position) {
     content: icon_content,
   });
 
+  // Center the map on the user's location
   map.setCenter({
     lat: position.coords.latitude,
     lng: position.coords.longitude,
