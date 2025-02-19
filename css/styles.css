@@ -1,12 +1,28 @@
 #map {
   width: 100%; /* Makes it responsive within its parent */
-  height: 80vh; /* Adjustable height based on viewport */
+  height: 60vh; /* Adjustable height based on viewport */
   max-width: 1400px; /* Prevents it from getting too large */
   max-height: 700px; /* Limits height for better layout control */
-
   margin: 0 auto; /* Centers horizontally */
   display: block; /* Ensures it respects margin auto */
-
   border-radius: 10px; /* Optional: Rounded corners */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Soft shadow */
+}
+
+@media (max-width: 576px) {
+  #map {
+    height: 300px; /* Reduce height for smaller screens */
+  }
+}
+
+.magic-separator {
+  height: 10px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  border-radius: 3px;
 }

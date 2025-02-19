@@ -273,11 +273,11 @@ function getDirections() {
 
   // Find the selected locations in the locations array or use the user's location
   const originLocation =
-    origin === "Your location"
+    origin === "You are here"
       ? userLocation
       : locations.find((loc) => loc.name === origin);
   const destinationLocation =
-    destination === "Your location"
+    destination === "You are here"
       ? userLocation
       : locations.find((loc) => loc.name === destination);
 
