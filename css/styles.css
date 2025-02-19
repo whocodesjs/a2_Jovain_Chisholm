@@ -1,0 +1,12 @@
+#map {
+  width: 100%; /* Makes it responsive within its parent */
+  height: 80vh; /* Adjustable height based on viewport */
+  max-width: 1400px; /* Prevents it from getting too large */
+  max-height: 700px; /* Limits height for better layout control */
+
+  margin: 0 auto; /* Centers horizontally */
+  display: block; /* Ensures it respects margin auto */
+
+  border-radius: 10px; /* Optional: Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Soft shadow */
+}
