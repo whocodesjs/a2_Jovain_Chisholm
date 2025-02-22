@@ -6,6 +6,7 @@ let map;
 let markers = [];
 let userMarker;
 let userLocation = null; // Store the user's location
+let directionsRenderer; // Store the directions renderer
 
 /**
  * Initializes the Google Map and sets up event listeners for various user interactions.
@@ -15,8 +16,12 @@ function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 43.2387, lng: -79.8881 },
     zoom: 12,
-    mapId: "f1b7b3b3b1b7b3b3", // Replace with a valid Map ID or remove if not needed
+    mapId: "MAP_ID", // Replace with a valid Map ID or remove if not needed
   });
+
+  // Initialize the directions renderer
+  directionsRenderer = new google.maps.DirectionsRenderer();
+  directionsRenderer.setMap(map);
 
   // Loop through the locations array and create markers
   for (const location of locations) {
@@ -59,7 +64,7 @@ function initMap() {
 
           // Store the user's location
           userLocation = {
-            name: "You are here",
+            name: "Your Location",
             lat: pos.lat,
             lng: pos.lng,
           };
@@ -210,8 +215,8 @@ function listDropdownOptions() {
   // Add the user's location to the dropdowns if available
   if (userLocation) {
     const userOption = document.createElement("option");
-    userOption.value = "You are here";
-    userOption.textContent = "You are here";
+    userOption.value = "Your Location";
+    userOption.textContent = "Your Location";
 
     originDropdown.appendChild(userOption.cloneNode(true));
     destinationDropdown.appendChild(userOption);
@@ -260,6 +265,13 @@ function updateDropdown() {
 }
 
 /**
+ * Clears the directions from the map.
+ */
+function clearDirections() {
+  directionsRenderer.setDirections({ routes: [] });
+}
+
+/**
  * Gets directions between the selected origin and destination.
  */
 function getDirections() {
@@ -273,11 +285,11 @@ function getDirections() {
 
   // Find the selected locations in the locations array or use the user's location
   const originLocation =
-    origin === "You are here"
+    origin === "Your Location"
       ? userLocation
       : locations.find((loc) => loc.name === origin);
   const destinationLocation =
-    destination === "You are here"
+    destination === "Your Location"
       ? userLocation
       : locations.find((loc) => loc.name === destination);
 
@@ -286,9 +298,11 @@ function getDirections() {
     return;
   }
 
+  // Clear existing directions
+  clearDirections();
+
   // Use Google Maps DirectionsService to get directions
   const directionsService = new google.maps.DirectionsService();
-  const directionsRenderer = new google.maps.DirectionsRenderer();
   directionsRenderer.setMap(map);
 
   directionsService.route(
